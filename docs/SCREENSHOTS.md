@@ -109,7 +109,7 @@ All images are located in the `/screenshots` folder.
 *Two alarms: `moodCPUAlert` and `ECSReactionsCPU` – both monitor CPUUtilisation > 75% for 1 datapoint within 5 minutes.*
 
 ### 19. SNS Topic – Email Alerts
-![SNS Topic](../screenshots/AWS_SNS.PNG)
+![SNS Topic](../screenshots/AWS%20SNS.PNG)
 *SNS topic `Buzzboard` with confirmed email subscription. Used to deliver CloudWatch alarm notifications.*
 
 ---
