@@ -13,7 +13,7 @@ Buzzboard is a real-time mood and reactions wall application. Users can:
 - Post reactions (stored in MySQL, cached in Redis)
 - Post their mood of the day (aggregated in real-time)
 
-This repository contains the complete infrastructure-as-code, deployment guides, and application code for running Buzzboard on AWS.
+This repository contains the complete deployment guides, and application code for running Buzzboard on AWS. (You Can Check Everything in docs folder)
 
 **Original source:** [buzzboard-k8s](https://github.com/yahiax20/buzzboard-k8s) (Kubernetes/k3s version)
 
