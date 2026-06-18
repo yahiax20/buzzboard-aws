@@ -302,9 +302,7 @@ This is a personal portfolio project. Feel free to fork and adapt for your own d
 - Add WAF rules to API Gateway
 
 P.S. I'll Add Terraform Template later after studying it.
-## License
 
-MIT — See [LICENSE](LICENSE) for details.
 
 ## Author
 
