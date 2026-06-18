@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ashour Chat Tutorial</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='.9em' font-size='28'>💬</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { margin: 0; min-height: 100vh; background: #0f0f14; color: #e8e8e8; font-family: 'Outfit', system-ui, sans-serif; }
+    .app { max-width: 720px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+    .panel { display: none; }
+    .panel.active { display: block; animation: fadeIn 0.25s ease; }
+    body.state-logged-in .auth-panel { display: none !important; }
+    body.state-logged-out .content-panel { display: none !important; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="state-logged-out">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="app">
+    <header class="site-header">
+      <h1 class="site-title">Ashour Chat Tutorial</h1>
+      <p class="site-tagline">Reactions & mood — how's the room?</p>
+      <p class="auth-explainer menu-guest" id="auth-explainer">Sign in so your reactions and mood are <strong>recorded with your name</strong>. New? Sign up first.</p>
+      <div class="signed-in-badge menu-user" id="signed-in-badge" style="display: none;">
+        <span class="badge-dot"></span>
+        <span>Signed in as <strong id="menu-username"></strong></span>
+      </div>
+      <nav class="menu-bar" role="navigation" aria-label="Main">
+        <div class="menu-group menu-guest" id="menu-guest">
+          <button type="button" class="menu-btn" data-view="signin">Sign in</button>
+          <button type="button" class="menu-btn" data-view="signup">Sign up</button>
+        </div>
+        <div class="menu-group menu-user" id="menu-user" style="display: none;">
+          <button type="button" class="menu-btn" data-view="reactions">Reaction Wall</button>
+          <button type="button" class="menu-btn" data-view="mood">Mood of the Day</button>
+          <span class="menu-hello" id="menu-hello">Hello, <strong id="menu-username-nav"></strong></span>
+          <button type="button" class="menu-btn menu-btn-logout" id="btn-logout">Log out</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main-content" id="main-content">
+      <section id="signin-panel" class="panel auth-panel page-section" data-view="signin" aria-label="Sign in page">
+        <div class="auth-card page-card auth-card-signin">
+          <div class="auth-card-icon" aria-hidden="true">👋</div>
+          <h2>Sign in</h2>
+          <p class="auth-card-desc">Enter your username and password. Your reactions and mood are saved with your name.</p>
+          <form id="signin-form" class="auth-form">
+            <label for="signin-username">Username</label>
+            <input type="text" id="signin-username" name="username" required autocomplete="username" placeholder="Your username" />
+            <label for="signin-password">Password</label>
+            <input type="password" id="signin-password" name="password" required autocomplete="current-password" placeholder="Your password" />
+            <p class="auth-error" id="signin-error" aria-live="polite"></p>
+            <button type="submit" class="btn-primary">Sign in</button>
+            <p class="auth-switch">Don't have an account? <button type="button" class="link-btn" data-view="signup">Sign up</button></p>
+          </form>
+        </div>
+      </section>
+
+      <section id="signup-panel" class="panel auth-panel page-section" data-view="signup" aria-label="Sign up page">
+        <div class="auth-card page-card auth-card-signup">
+          <div class="auth-card-icon" aria-hidden="true">✨</div>
+          <h2>Sign up</h2>
+          <p class="auth-card-desc">Create an account. Your reactions and mood will be saved with your username.</p>
+          <form id="signup-form" class="auth-form">
+            <label for="signup-username">Username</label>
+            <input type="text" id="signup-username" name="username" required minlength="2" maxlength="100" autocomplete="username" placeholder="Choose a username" />
+            <label for="signup-password">Password</label>
+            <input type="password" id="signup-password" name="password" required minlength="6" autocomplete="new-password" placeholder="At least 6 characters" />
+            <p class="auth-error" id="signup-error" aria-live="polite"></p>
+            <button type="submit" class="btn-primary">Create account</button>
+            <p class="auth-switch">Already have an account? <button type="button" class="link-btn" data-view="signin">Sign in</button></p>
+          </form>
+        </div>
+      </section>
+
+      <section id="reactions-panel" class="panel content-panel page-section" data-view="reactions" aria-label="Reaction Wall page">
+        <div class="page-card">
+          <h2>Reaction Wall</h2>
+          <p class="hint">Post a short message or pick a reaction. Saved to the database; recent ones from cache.</p>
+          <div class="stats" id="reactions-stats" aria-live="polite"></div>
+          <form id="reaction-form" class="form" aria-describedby="reaction-feedback">
+            <label for="reaction-message" class="sr-only">Your message or emoji</label>
+            <input type="text" id="reaction-message" placeholder="Your message or emoji…" maxlength="200" aria-label="Reaction message" />
+            <div class="emoji-row" role="group" aria-label="Quick emoji">
+              <button type="button" class="emoji-btn" data-emoji="👍" aria-label="Thumbs up">👍</button>
+              <button type="button" class="emoji-btn" data-emoji="🔥" aria-label="Fire">🔥</button>
+              <button type="button" class="emoji-btn" data-emoji="🎉" aria-label="Celebrate">🎉</button>
+              <button type="button" class="emoji-btn" data-emoji="❤️" aria-label="Heart">❤️</button>
+            </div>
+            <button type="submit" class="btn-primary">Post</button>
+          </form>
+          <div id="reaction-feedback" class="toast toast-success" role="status" aria-live="polite"></div>
+          <ul id="reactions-list" class="reactions-list" aria-label="Reactions"><li class="loading-item"><span class="spinner" aria-hidden="true"></span> Loading…</li></ul>
+        </div>
+      </section>
+
+      <section id="mood-panel" class="panel content-panel page-section" data-view="mood" aria-label="Mood of the Day page">
+        <div class="page-card">
+          <h2>Mood of the Day</h2>
+          <p class="mood-greeting">How's the room today, <strong id="mood-username"></strong>? Your vote is recorded with your account.</p>
+          <div class="stats" id="mood-stats" aria-live="polite"></div>
+          <div class="mood-buttons" role="group" aria-label="Vote for today’s mood">
+            <button type="button" class="mood-btn" data-mood="sleepy">😴 Mostly surviving</button>
+            <button type="button" class="mood-btn" data-mood="neutral">😐 It's okay</button>
+            <button type="button" class="mood-btn" data-mood="fire">🔥 On fire</button>
+          </div>
+          <div id="mood-feedback" class="toast toast-success" role="status" aria-live="polite"></div>
+          <div id="mood-tally" class="mood-tally" aria-live="polite"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+      <p class="footer-tag">Contact</p>
+      <div class="footer-links">
+        <a href="mailto:ashouryasser11@gmail.com" class="footer-link" aria-label="Email">ashouryasser11@gmail.com</a>
+        <a href="tel:+201122255584" class="footer-link" aria-label="Phone">+20 112 225 5584</a>
+        <a href="https://www.linkedin.com/in/ashour-yasser/" target="_blank" rel="noopener noreferrer" class="footer-link footer-link-linkedin" aria-label="LinkedIn profile">LinkedIn</a>
+      </div>
+    </footer>
+  </div>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

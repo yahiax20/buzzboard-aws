@@ -1,0 +1,119 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: buzzboard-redis
+    command: redis-server --requirepass buzzboard-redis-secret
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a buzzboard-redis-secret ping"] 
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks: 
+      - buzzboard-net
+  
+
+  mysql:
+    image: mysql:8.0
+    container_name: buzzboard-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER}", 
+            "-p${MYSQL_PASSWORD}"] 
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - buzzboard-net
+  reactions:
+    build:
+      context: ./backend/reactions
+      dockerfile: Dockerfile
+    image: yahiaxx20/buzzboard-reactions:latest
+    container_name: buzzboard-reactions
+    environment:
+      PORT: 8081
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      MYSQL_HOST: mysql
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      JWT_SECRET: ${JWT_SECRET}
+      MOOD_SVC_URL: http://mood:8082 
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - buzzboard-net
+  mood:
+    build:
+      context: ./backend/mood
+      dockerfile: Dockerfile
+    image: yahiaxx20/buzzboard-mood:latest
+    container_name: buzzboard-mood
+    environment:
+      PORT: 8082
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      MYSQL_HOST: mysql
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      JWT_SECRET: ${JWT_SECRET}
+      REACTIONS_SVC_URL: http://reactions:8081
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - buzzboard-net
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: yahiaxx20/buzzboard-frontend:latest
+    container_name: buzzboard-frontend
+    ports:
+      - "3001:80"
+    depends_on:
+      - reactions
+      - mood
+
+    restart: unless-stopped
+    networks:
+      - buzzboard-net
+volumes:
+   mysql-data:
+    
+   redis-data:
+networks:
+   buzzboard-net:
+     driver: bridge
+     name: buzzboard-net    

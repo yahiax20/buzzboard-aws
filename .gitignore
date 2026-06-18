@@ -1,0 +1,27 @@
+.env
+.env.local
+.env.production
+*.pem
+*.key
+aws-credentials.json
+
+# Node
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+*.tgz
